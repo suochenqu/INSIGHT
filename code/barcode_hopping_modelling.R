@@ -30,7 +30,7 @@ barcode_used$pool <- ifelse(is.na(barcode_used$time_to_detection), 'neg', 'pos')
 all_seq <- readLines('data/barcode_hopping/all_linear_trimmed.seq.gz') # 102nt seq
 pool_sequence <- data.frame(
   'first_5' = substr(all_seq, 1, 5),
-  'last_5' = substr(all_seq, 6, 10)
+  'last_5' = substr(all_seq, 98, 102)
 )
 pool_sequence$combined <- paste0(pool_sequence$first_5, pool_sequence$last_5)
 
