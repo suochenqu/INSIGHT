@@ -7,6 +7,7 @@ burst <- function(seq) strsplit(seq, '')[[1]]
 compl <- function(seq) paste0(pairing[rev(burst(seq))], collapse='')
 hamming <- function(u, v){stringdist(u, v, method='hamming')}
 
+
 ##### load used barcode combinations and corresponding Stage 1 results #####
 # barcode_used.csv is a comma separated file such that each row contains
 # information of a specific barcode pair used in NASBA reaction, including the
@@ -24,6 +25,7 @@ barcode_used$sequence <- paste0(barcode_used$right_sequence,
 barcode_used$name <- paste0(barcode_used$right_name, barcode_used$left_name)
 barcode_used$pool <- ifelse(is.na(barcode_used$time_to_detection), 'neg', 'pos')
 
+
 ##### load sequencing results #####
 all_seq <- readLines('data/barcode_hopping/all_linear_trimmed.seq.gz') # 102nt seq
 pool_sequence <- data.frame(
@@ -31,6 +33,8 @@ pool_sequence <- data.frame(
   'last_5' = substr(all_seq, 6, 10)
 )
 pool_sequence$combined <- paste0(pool_sequence$first_5, pool_sequence$last_5)
+
+
 ##### match sequences to barcodes #####
 # generate hamming distance matrix with rows representing sequenced barcodes
 # and columns representing used barcodes
