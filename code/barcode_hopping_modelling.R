@@ -132,13 +132,13 @@ plot(y=calling_table$read_count[!calling_table$used], x=fitted(model),
      xlab='predicted reads', ylab='actual reads', log='xy');
 abline(a=0, b=1, col='blue')
 xs <- exp(seq(0,log(ymax),length=1000)); sd <- sqrt(xs + xs^2/theta)
-alpha=0.05
+alpha <- 0.05
 y_upper <- qnbinom(1-alpha/2, size=theta, mu=xs)
 y_lower <- qnbinom(alpha/2, size=theta, mu=xs)
 points(xs, y_upper, type='l', lty=2, col='blue')
 points(xs, y_lower, type='l', lty=2, col='blue')
 
-alpha=0.0001
+alpha <- 0.0001
 y_upper <- qnbinom(1-alpha/2, size=theta, mu=xs)
 y_lower <- qnbinom(alpha/2, size=theta, mu=xs)
 points(xs, y_upper, type='l', lty=2, col='red')
