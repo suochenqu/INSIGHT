@@ -477,7 +477,6 @@ dev.off()
 
 ##### new3 (16 Jul) #####
 date <- '16_Jul'; infile <- 'data/16_Jul/160720_seq5.csv'
-palet <- putils::matplotlib_palette(10)
 lines <- readLines(infile)
 lines <- lines[lines!='']; lines <- lines[-(1:6)]
 writeLines(lines, paste0(infile, '.processed'))
