@@ -108,8 +108,8 @@ calling_table$hamming1read <- apply(dist_to_used == 1, 1,
 
 ##### fit negative binomial model #####
 # fit hopping model using hopped barcode pairs
-model <- glm.nb(read_count ~ left_count*right_count + hamming1read,
-                link='identity', data=calling_table[!calling_table$used,])
+model <- glm.nb(read_count ~ left_count * right_count + hamming1read,
+                link='identity', data=calling_table[!calling_table$used, ])
 AIC(model)
 summary(model)
 beta <- model$coefficients  # regression coefficients
@@ -145,5 +145,5 @@ points(xs, y_upper, type='l', lty=2, col='red')
 points(xs, y_lower, type='l', lty=2, col='red')
 
 points(calling_table$pred[calling_table$used],
-       calling_table$read_count[calling_table$used], pch=20, cex = 0.5, col = 'green')
+       calling_table$read_count[calling_table$used], pch=20, cex=0.5, col='green')
 
