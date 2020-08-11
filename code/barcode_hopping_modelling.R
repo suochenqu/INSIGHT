@@ -27,7 +27,7 @@ barcode_used$pool <- ifelse(is.na(barcode_used$time_to_detection), 'neg', 'pos')
 
 
 ##### load sequencing results #####
-all_seq <- readLines('~/INSIGHT/trial 4_paper/1_clean_noID.seq') # 102nt seq
+all_seq <- readLines('data/barcode_hopping/all_linear_pool.seq') # 102nt seq
 pool_sequence <- data.frame(
   'first_5' = substr(all_seq, 1, 5),
   'sequence' = substr(all_seq, 6, 97),
