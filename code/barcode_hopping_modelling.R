@@ -27,14 +27,14 @@ barcode_used$pool <- ifelse(is.na(barcode_used$time_to_detection), 'neg', 'pos')
 
 
 ##### load sequencing results #####
-all_seq <- readLines('data/barcode_hopping/all_linear_pool.seq') # 102nt seq
+all_seq <- readLines('data/barcode_hopping/all_linear_pool.seq.gz') # 102nt seq
 pool_sequence <- data.frame(
   'first_5' = substr(all_seq, 1, 5),
   'sequence' = substr(all_seq, 6, 97),
   'last_5' = substr(all_seq, 98, 102)
 )
 
-ham <- hamming(pool_sequence$sequence, 
+ham <- hamming(pool_sequence$sequence,
              'ACACCTGTGCCTGTTAAACCATTGAAGTTGAAATTGACACATTTGTTTTTAACCAAATTAGTAGACTTTTTAGGTCCACAAACAGTTGCTGG')
 
 pool_sequence <- pool_sequence[ham <3,]
