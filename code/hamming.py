@@ -20,30 +20,32 @@ import sys, getopt
 Define a class `Nucleotide` that encodes 'A C G T' by a finite field of 4 
 elements GF(4). 
 """
-additionMatrix = [[0, 1, 2, 3], 
-                  [1, 0, 3, 2],
-                  [2, 3, 0, 1],
-                  [3, 2, 1, 0]]
-subtractionMatrix = [[0, 1, 2, 3], 
-                     [1, 0, 3, 2],
-                     [2, 3, 0, 1],
-                     [3, 2, 1, 0]]
-multiplicationMatrix = [[0, 0, 0, 0],
-                        [0, 1, 2, 3],
-                        [0, 2, 3, 1],
-                        [0, 3, 1, 2]]
-divisionMatrix = [[5, 0, 0, 0],  # 4 ('-') codes for Inf, 5 ('*') codes for NaN
-                 [4, 1, 3, 2],
-                 [4, 2, 1, 3],
-                 [4, 3, 2, 1]]
+# define arithmetics over the field GF(4)
+additionMatrix          = [[0, 1, 2, 3], 
+                           [1, 0, 3, 2],
+                           [2, 3, 0, 1],
+                           [3, 2, 1, 0]]
+subtractionMatrix       = [[0, 1, 2, 3], 
+                           [1, 0, 3, 2],
+                           [2, 3, 0, 1],
+                           [3, 2, 1, 0]]
+multiplicationMatrix    = [[0, 0, 0, 0],
+                           [0, 1, 2, 3],
+                           [0, 2, 3, 1],
+                           [0, 3, 1, 2]]
+# divisionMatrix[i,j] is equal to i / j in GF(4)
+# 4 ('-') codes for Inf, 5 ('*') codes for NaN
+divisionMatrix          = [[5, 0, 0, 0],  
+                           [4, 1, 3, 2],
+                           [4, 2, 1, 3],
+                           [4, 3, 2, 1]]
+
 # Nucleotide is a class that represents the four nucleotides 'A' 'C' 'G' 'T'
 # as the field with four elements. Specifically, 'A' is the additive identity,
 # 'C' the multiplicative identity.
 class Nucleotide:
     def __init__(self, ind):
         self.ind = ind
-    def __str__(self):
-        return ['A', 'C', 'G', 'T', '-', '*'][self.ind]
     def __add__(self, other):
         return Nucleotide(additionMatrix[self.ind][other.ind])
     def __sub__(self, other):
@@ -54,12 +56,13 @@ class Nucleotide:
         return Nucleotide(divisionMatrix[self.ind][other.ind])
     def __eq__(self, other): 
         return self.ind == other.ind
+    def __str__(self):
+        return ['A', 'C', 'G', 'T', '-', '*'][self.ind]
     def __repr__(self):
         return str(self.ind)
         
-
-# display number representation for Nucleotides, mx is either a matrix or a 
-# vector
+# convert from a matrix/vector of GF(4) elements to the corresponding
+# matrix/vector of {0,1,2,3}.
 def nuc_to_ind(mx):
     if type(mx) is list:
         mx = np.array(mx)
@@ -68,6 +71,8 @@ def nuc_to_ind(mx):
     else: # if mx is a vector
         return np.array([letter.ind for letter in mx])
 
+# convert from a matrix/vector of indices to the corresponding matrix/vector
+# of GF(4) elements
 def ind_to_nuc(A_ind):
     if type(A_ind) is list: 
         A_ind = np.array(A_ind)
@@ -159,7 +164,7 @@ def generator(n, d, max_trials=10000):
                 G_nuc = ind_to_nuc(G_ind)
                 return (G_nuc, H_nuc, k, r)
         r = r + 1  # increase redundancy to make linear independence more likely
-        print('Max_trials reached... reating generator matrix for k =', n - r)
+        print('Max_trials reached... creating generator matrix for k =', n - r)
         
 #%%
 """
