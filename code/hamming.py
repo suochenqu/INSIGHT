@@ -207,7 +207,7 @@ def main(argv):
     
     # get commandline input arguments
     try:
-        opts, args = getopt.getopt(argv,"hn:d:o:",["outfile="])
+        opts, args = getopt.getopt(argv,'hn:d:o:',['outfile='])
     except getopt.GetoptError:
         print('hamming.py -n <code_length> -d <hamming_dist> -o <out_file>')
         sys.exit(2)
@@ -217,18 +217,18 @@ def main(argv):
         if opt == '-h':
             print('hamming.py -n <code_length> -d <hamming_dist> -o <out_file>')
             sys.exit()
-        elif opt in ("-n"):
+        elif opt in ('-n'):
             n = int(arg)
-        elif opt in ("-d"):
+        elif opt in ('-d'):
             d = int(arg)
-        elif opt in ("-o", "--outfile"):
+        elif opt in ('-o', '--outfile'):
             outFile = str(arg)
     
     # run linear_code function
     linear_code(n, d, outFile)
     
 # run main function if directly executed from commandline
-if __name__ == "__main__":
+if __name__ == '__main__':
    main(sys.argv[1:])
 
 
