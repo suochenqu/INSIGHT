@@ -4,6 +4,8 @@
 This script can be used to generate a large number of Hamming-distance d
 separated 4-ary codes (e.g. DNA barcodes) of length n. Code constructed via
 linear block code. 
+
+usage example: hamming.py -n 12 -d 3 -o 'codes.txt'
 """
 #%%
 """
