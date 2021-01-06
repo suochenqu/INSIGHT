@@ -24,7 +24,7 @@ LoD <- function(dat_mx, level=0.95){
 
   # confidence interval for p constructed using log likelihood
   # ratio test (chisq with 1 dof under the null)
-  ps = seq(0, 1, by=0.0001)
+  ps <- seq(0, 1, by=0.0001)
   loglik <- sapply(ps, func)
   threshold <- ret$objective - qchisq(level, df=1) / 2
   CI_p <- range(ps[setNA(loglik > threshold, FALSE)])
@@ -44,10 +44,10 @@ LoD <- function(dat_mx, level=0.95){
 #### Two stage LoD ####
 
 LoD_ts <- function(mx1, mx2, level=0.95){
-  alpha = 1 - level
-  ratio = sum(mx1[,-1]) / sum(mx2[,-1])
-  alpha2 = alpha / (ratio + 1)
-  alpha1 = alpha2 * ratio
+  alpha <- 1 - level
+  ratio <- sum(mx1[,-1]) / sum(mx2[,-1])
+  alpha2 <- alpha / (ratio + 1)
+  alpha1 <- alpha2 * ratio
   ret1 <- LoD(mx1, level=1-alpha1)
   ret2 <- LoD(mx2, level=1-alpha2)
   p <- ret1$prob; CI_p <- ret1$CI_prob
