@@ -172,6 +172,8 @@ barcode_hopping_modelling <- function(barcode_used, calling_table, Zscore_thresh
   beta <- model$coefficients  # regression coefficients
   theta <- summary(model)$theta  # overdispersion parameter
   calling_table$pred <- predict(model, calling_table) # fitted hopped count
+  calling_table$Z_score <- with(calling_table,
+                                (read_count - pred) / (qnbinom(0.975, size=theta, mu=pred) - pred) * 2)
   barcode_used$pred <- calling_table$pred[match(barcode_used$sequence, calling_table$sequence)]
 
   ## Z score calculation ##
@@ -191,7 +193,8 @@ barcode_hopping_modelling <- function(barcode_used, calling_table, Zscore_thresh
           col=ifelse(barcode_used$stage_1_result[ord]=='positive',2,1),
           names.arg=barcode_used$ID[ord], ylab='Z score', axes=F)
   axis(2,at=10^seq(0, ceiling(log10(barcode_used$Z_score[ord[1]]))))
-  legend('topright', col=c(1,2), legend=c('Stage 1 negative', 'Stage 1 positive'), pch=15)
+  abline(h=Zscore_thresh, lty=2, lwd=2)
+  legend('topright', col=c(1,2, 1), legend=c('Stage 1 negative', 'Stage 1 positive', 'Zscore threshold'), pch=c(15,15,NA), lty=c(NA,NA,2))
   dev.off()
 
   # predicted vs actual plot #
@@ -237,25 +240,30 @@ barcode_hopping_modelling <- function(barcode_used, calling_table, Zscore_thresh
 
 ##### main #####
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 3 || length(args) > 4) {
-  stop('usage: Rscript analyse_results.R barcode_info_file all_pool_reads_file neg_pool_reads_file [output_file]')
+if (length(args) < 3 || length(args) > 5) {
+  stop('usage: Rscript analyse_results.R barcode_info_file all_pool_reads_file neg_pool_reads_file [Zscore_thresh output_file]')
 } else if (length(args) == 3){
   output_file <- 'results.csv'
+  Zscore_thresh <- 10
+} else if (length(args) == 4){
+  output_file <- 'results.csv'
+  Zscore_thresh <- as.numeric(args[4])
 } else {
-  output_file <- args[4]
+  output_file <- args[5]
+  Zscore_thresh <- as.numeric(args[4])
 }
 
 # analyse all pool reads
 cat('Analysing all pool reads ...\n')
 tmp <- preprocess(barcode_info_file=args[1],
                   pool_reads_file=args[2])
-ret <- barcode_hopping_modelling(tmp$barcode_used, tmp$calling_table)
+ret <- barcode_hopping_modelling(tmp$barcode_used, tmp$calling_table, Zscore_thresh)
 
 # analyse negative pool reads
 cat('Analysing negative pool reads ...\n')
 tmp2 <- preprocess(barcode_info_file=args[1],
                   pool_reads_file=args[3])
-ret2 <- barcode_hopping_modelling(tmp2$barcode_used, tmp2$calling_table)
+ret2 <- barcode_hopping_modelling(tmp2$barcode_used, tmp2$calling_table, Zscore_thresh)
 
 # combine pools for stage 2 results
 stage_2_result <- ret$stage_2_result=='positive' | ret2$stage_2_result=='positive'
@@ -275,7 +283,11 @@ cat('Done. Output saved in', output_file, '\n')
 
 
 
-
-
+##### debugging #######
+tmp <- preprocess('barcode_used.csv', 'all_pool_reads.csv')
+calling_table <- tmp$calling_table
+barcode_used <- tmp$barcode_used
+write.csv(calling_table, 'calling_table.csv', row.names = F)
+calling_table$left_seq <- sapply(calling_table$left_seq, compl)
 
 
