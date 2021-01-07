@@ -234,60 +234,42 @@ barcode_hopping_modelling <- function(barcode_used, calling_table, Zscore_thresh
 
 
 
-
-
-
-
 ##### main #####
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 3 || length(args) > 5) {
-  stop('usage: Rscript analyse_results.R barcode_info_file all_pool_reads_file neg_pool_reads_file [Zscore_thresh output_file]')
-} else if (length(args) == 3){
-  output_file <- 'results.csv'
-  Zscore_thresh <- 10
-} else if (length(args) == 4){
-  output_file <- 'results.csv'
-  Zscore_thresh <- as.numeric(args[4])
-} else {
-  output_file <- args[5]
-  Zscore_thresh <- as.numeric(args[4])
+if (length(args) < 3 || length(args) > 4) {
+  stop('usage: Rscript analyse_results.R barcode_info_file Zscore_thresh all_pool_reads_file [neg_pool_reads_file]')
 }
+Zscore_thresh <- as.numeric(args[2])
+output_file <- 'results.csv'
 
 # analyse all pool reads
 cat('Analysing all pool reads ...\n')
 tmp <- preprocess(barcode_info_file=args[1],
-                  pool_reads_file=args[2])
+                  pool_reads_file=args[3])
 ret <- barcode_hopping_modelling(tmp$barcode_used, tmp$calling_table, Zscore_thresh)
+stage_2_pos <- ret$stage_2_result == 'positive'
 
 # analyse negative pool reads
-cat('Analysing negative pool reads ...\n')
-tmp2 <- preprocess(barcode_info_file=args[1],
-                  pool_reads_file=args[3])
-ret2 <- barcode_hopping_modelling(tmp2$barcode_used, tmp2$calling_table, Zscore_thresh)
+if (length(args) == 4){
+  cat('Analysing negative pool reads ...\n')
+  tmp2 <- preprocess(barcode_info_file=args[1],
+                     pool_reads_file=args[4])
+  ret2 <- barcode_hopping_modelling(tmp2$barcode_used, tmp2$calling_table, Zscore_thresh)
 
-# combine pools for stage 2 results
-stage_2_result <- ret$stage_2_result=='positive' | ret2$stage_2_result=='positive'
+  # combine pools for stage 2 results
+  stage_2_pos <- stage_2_pos | (ret2$stage_2_result=='positive')
+}
 
 # combine stage 1 and stage 2 results
-stage_1_result <- ret$stage_1_result=='positive'
-result <- rep('negative', length(stage_1_result))
-result[stage_1_result | stage_2_result] <- 'suspected'
-result[stage_1_result & stage_2_result] <- 'positive'
+stage_1_pos <- ret$stage_1_result=='positive'
+result <- rep('negative', length(stage_1_pos))
+result[stage_1_pos | stage_2_pos] <- 'suspected'
+result[stage_1_pos & stage_2_pos] <- 'positive'
 
 # write output to csv file
-df <- tmp$barcode_used[,1:4]
-df$stage_2_result <- ifelse(stage_2_result, 'positive', 'negative')
+df <- tmp$barcode_used[, 1:4]
+df$stage_2_result <- ifelse(stage_2_pos, 'positive', 'negative')
 df$combined_result <- result
 write.csv(df, file=output_file, row.names=F)
 cat('Done. Output saved in', output_file, '\n')
-
-
-
-##### debugging #######
-tmp <- preprocess('barcode_used.csv', 'all_pool_reads.csv')
-calling_table <- tmp$calling_table
-barcode_used <- tmp$barcode_used
-write.csv(calling_table, 'calling_table.csv', row.names = F)
-calling_table$left_seq <- sapply(calling_table$left_seq, compl)
-
 
